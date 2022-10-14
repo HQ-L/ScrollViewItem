@@ -20,18 +20,20 @@ class ViewController: UIViewController {
         let tapView3 = UITapGestureRecognizer(target: self, action: #selector(tapView3Action))
 
         let cardContents = [
-            CardContent(title: "下载", image: UIImage(named: "rip")),
-            CardContent(title: "分享", image: nil),
-            CardContent(title: "删除", image: nil)
+            CardContent(title: "下载", handler: nil, image: UIImage(named: "rip")),
+            CardContent(title: "分享", handler: nil, image: nil),
+            CardContent(title: "删除", handler: nil, image: nil)
         ]
         view.backgroundColor = .orange
 
         menuView = MenuView(frame: view.bounds, image: UIImage(named: "rip") ?? UIImage())
         menuView.addStructs(cardContents)
-        menuView.addStruct(CardContent(title: "123", image: nil))
-        menuView.addStruct(CardContent(title: "456", image: nil))
-        menuView.setupTapAction(index: 0, tapGesture: tapView1)
+        menuView.addStruct(CardContent(title: "123", handler: handlerFunction, image: nil))
         view.addSubview(menuView)
+    }
+
+    func handlerFunction() {
+        print(123)
     }
 
     @objc func tapView1Action(_ tapGesture: UITapGestureRecognizer) {

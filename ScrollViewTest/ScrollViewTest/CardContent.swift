@@ -10,5 +10,6 @@ import UIKit
 
 struct CardContent {
     let title: String
+    let handler: (()->Void)?
     let image: UIImage?
 }

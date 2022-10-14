@@ -16,11 +16,7 @@ class MenuView: UIView {
     private var cardContents = [CardContent]()
     private var scrollViewFrameParameter: CGFloat = 0.0 {
         didSet {
-            // 不使用layoutIfNeeded会导致这里无法通过frame去计算scrollView的contentSize
-            // 所以不使用layoutIfNeeded方法，解决方法是延迟设置contentSize
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.000001) { [self] in
-                scrollView.contentSize = CGSize(width: scrollView.frame.width, height: scrollView.frame.height / scrollViewFrameParameter * CGFloat(cardContents.count))
-            }
+            scrollView.contentSize = CGSize(width: self.bounds.width - 60, height: 50 * CGFloat(cardContents.count))
         }
     }
 
@@ -58,16 +54,6 @@ extension MenuView {
             self.cardContents.append(cardContents[index])
         }
         completeAddStruct()
-    }
-
-    /// 设置手势
-    func setupTapAction(index: Int, tapGesture: UITapGestureRecognizer) {
-        // 越界检测
-        if index > self.allViews.count-1 {
-            fatalError("index out of range, maxnum is \(self.allViews.count-1)")
-        } else {
-            self.allViews[index].addGestureRecognizer(tapGesture)
-        }
     }
 }
 
@@ -136,7 +122,8 @@ private extension MenuView {
 
         for index in 0..<cardContents.count {
             let cardView = UIView()
-            cardView.addGestureRecognizer(defaultTapGesture())
+            cardView.addGestureRecognizer(tapGesture())
+            cardView.tag = index
             scrollView.addSubview(cardView)
 
             cardView.layer.borderColor = UIColor.gray.cgColor
@@ -197,21 +184,21 @@ private extension MenuView {
         setupCardView()
     }
 
-    func defaultTapGesture() -> UITapGestureRecognizer {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(defaultTapAction))
+    func tapGesture() -> UITapGestureRecognizer {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAction))
 
         return tapGesture
     }
 
-    @objc func defaultTapAction(_ tapGesture: UITapGestureRecognizer) {
+    @objc func tapAction(_ tapGesture: UITapGestureRecognizer) {
         UIView.animate(withDuration: 0.13, delay: 0, animations: {
             tapGesture.view?.alpha = 0.23
         }, completion: { _ in
             UIView.animate(withDuration: 0.06, delay: 0, animations: {
                 tapGesture.view?.alpha = 1.0
             })
+            guard let handler = self.cardContents[tapGesture.view?.tag ?? 0].handler else { return }
+            handler()
         })
-
-        print("--已调用默认单击手势响应--")
     }
 }
